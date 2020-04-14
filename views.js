@@ -1,5 +1,7 @@
 // views.js
+// Views handle retrieving information from the local database and rendering it into the page templates.
 
+// Local Imports
 const { generateRandomString } = require('./services');
 
 const urlDatabase = {

@@ -1,7 +1,10 @@
 // express_server.js
 
+// Third Party Imports
 const express = require('express');
 const bodyParser = require('body-parser');
+
+// Local Imports
 const routes = require('./routes');
 
 const PORT = 8080;
