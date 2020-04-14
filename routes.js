@@ -24,7 +24,8 @@ router.route("/urls/new")
 
 // URL Details Page
 router.route("/urls/:shortURL")
-.get(views.getUrlDetails);
+.get(views.getUrlDetails)
+.post(views.postEditUrlDetails);
 
 // Delete URL Request
 router.route("/urls/:shortURL/delete")

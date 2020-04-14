@@ -40,6 +40,12 @@ const getUrlDetails = (req, res) => {
   res.render("pages/urls_show", templateVars);
 };
 
+const postEditUrlDetails = (req, res) => {
+  const shortUrl = req.params.shortURL;
+  urlDatabase[shortUrl] = req.body.longURL;
+  res.redirect(`/urls/${shortUrl}`);
+};
+
 const postDeleteUrl = (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
@@ -59,6 +65,7 @@ module.exports = {
   postUrlsPage,
   getNewUrlPage,
   getUrlDetails,
+  postEditUrlDetails,
   postDeleteUrl,
   shortUrlRedirect
 }
