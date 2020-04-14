@@ -1,47 +1,28 @@
 // routes.js
 
 const express = require('express');
+const views = require('./views');
+
+
 const router = express.Router();
 
 router.route("/")
-.get((req, res) => {
-  res.send("Hello!");
-});
+.get(views.getIndexPage);
 
 router.route("/urls")
-.get((req, res) => {
-  const templateVars = { urls: urlDatabase };
-  res.render("pages/urls_index", templateVars);
-})
-.post((req, res) => {
-  const shortUrl = generateRandomString();
-  urlDatabase[shortUrl] = req.body.longURL;
-  res.redirect(`/urls/${shortUrl}`);
-});
+.get(views.getUrlsPage)
+.post(views.postUrlsPage);
 
 router.route("/urls/new")
-.get((req, res) => {
-  res.render("pages/urls_new");
-});
+.get(views.getNewUrlPage);
 
 router.route("/urls/:shortURL")
-.get((req, res) => {
-  const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
-  const templateVars = { shortURL, longURL };
-  res.render("pages/urls_show", templateVars);
-});
+.get(views.getUrlDetails);
 
 router.route("/urls/:shortURL/delete")
-.post((req, res) => {
-  const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect("/urls");
-});
+.post(views.postDeleteUrl);
 
 router.route("/u/:shortURL")
-.get((req, res) => {
-  const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
-  res.redirect(longURL);
-});
+.get(views.shortUrlRedirect);
+
+module.exports = router;
