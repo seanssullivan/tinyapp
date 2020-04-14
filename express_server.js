@@ -9,7 +9,7 @@ const app = express();
 
 // MIDDLEWARE
 app.set("view engine", "ejs");
-app.use(bodyParser.urlenindexd({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -31,8 +31,9 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
+  const shortUrl = generateRandomString();
+  urlDatabase[shortUrl] = req.body.longURL;
+  res.redirect(`/urls/${shortUrl}`);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -40,6 +41,11 @@ app.get("/urls/:shortURL", (req, res) => {
   const longURL = urlDatabase[shortURL];
   const templateVars = { shortURL, longURL };
   res.render("urls_show", templateVars);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 app.get("/hello", (req, res) => {
