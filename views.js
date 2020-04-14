@@ -15,9 +15,28 @@ const getIndexPage = (req, res) => {
   res.send("Hello!");
 };
 
+// Login
+const postLogin = (req, res) => {
+  res
+  .status(201)
+  .cookie("username", req.body.username)
+  .redirect("/urls");
+};
+
+// Logout
+const postLogout = (req, res) => {
+  res
+  .status(201)
+  .clearCookie("username")
+  .redirect("/urls");
+};
+
 // URLs Page
 const getUrlsPage = (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+  };
   res.render("pages/urls_index", templateVars);
 };
 
@@ -29,14 +48,21 @@ const postUrlsPage = (req, res) => {
 
 // New URLs Page
 const getNewUrlPage = (req, res) => {
-  res.render("pages/urls_new");
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("pages/urls_new", templateVars);
 };
 
 // URLs Details Page
 const getUrlDetails = (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  const templateVars = { shortURL, longURL };
+  const templateVars = {
+    shortURL,
+    longURL,
+    username: req.cookies["username"]
+  };
   res.render("pages/urls_show", templateVars);
 };
 
@@ -61,6 +87,8 @@ const shortUrlRedirect = (req, res) => {
 
 module.exports = {
   getIndexPage,
+  postLogin,
+  postLogout,
   getUrlsPage,
   postUrlsPage,
   getNewUrlPage,

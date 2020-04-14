@@ -13,6 +13,15 @@ const router = express.Router();
 router.route("/")
 .get(views.getIndexPage);
 
+// Login Request
+router.route("/login")
+.post(views.postLogin);
+
+// Logout Request
+router.route("/logout")
+.post(views.postLogout);
+
+
 // URL Methods
 router.route("/urls")
 .get(views.getUrlsPage)

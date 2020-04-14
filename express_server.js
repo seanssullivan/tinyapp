@@ -3,6 +3,7 @@
 // Third Party Imports
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 // Local Imports
 const routes = require('./routes');
@@ -15,6 +16,7 @@ app.set("views", "templates");
 // MIDDLEWARE
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // ROUTES
 app.use('/', routes);
