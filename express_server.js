@@ -2,7 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const urls = require('./urls');
+const routes = require('./routes');
 
 const PORT = 8080;
 
@@ -14,7 +14,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // ROUTES
-app.use('/', urls);
+app.use('/', routes);
 
 // LISTENER
 app.listen(PORT, () => {
