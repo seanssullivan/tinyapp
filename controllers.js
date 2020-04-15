@@ -14,7 +14,13 @@ const urls = new Urls();
  * @param {*} res - Response object.
  */
 const getIndexPage = (req, res) => {
-  res.send("Hello!");
+  const userID = req.cookies["user_id"];
+  const user = users.findUserByID(userID);
+  if (!user) {
+    res.redirect("/login");
+  } else {
+    res.redirect("/urls");
+  }
 };
 
 /**
@@ -116,7 +122,8 @@ const postRegisterPage = (req, res) => {
 const getUrlsPage = (req, res) => {
   const userID = req.cookies["user_id"];
   const user = users.findUserByID(userID);
-  const templateVars = { user, urls };
+  const availableURLS = urls.urlsForUser(userID);
+  const templateVars = { user, urls: availableURLS };
   res.render("pages/urls_index", templateVars);
 };
 

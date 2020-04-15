@@ -10,10 +10,35 @@ class Urls {
     };
   }
 
-  all() {
-    return this._urls;
+  /**
+   * Returns the long URL for a given short URL.
+   * @param {string} shortURL 
+   */
+  getLongURL(shortURL) {
+    return this._urls[shortURL].longURL;
   }
 
+  /**
+   * Returns the ID for the user who owns a given short URL.
+   * @param {string} shortURL 
+   */
+  getUserID(shortURL) {
+    return this._urls[shortURL].userID;
+  }
+
+  /**
+   * Returns all urls owned by user.
+   * @param {string} userID 
+   */
+  urlsForUser(userID) {
+    return Object.values(this._urls).filter(url => url.userID === userID);
+  }
+
+  /**
+   * Creates a new short URL.
+   * @param {string} longURL 
+   * @param {string} userID 
+   */
   addURL(longURL, userID) {
     const shortURL = generateRandomString(6);
     const urlData = {
@@ -24,6 +49,12 @@ class Urls {
     return shortURL;
   }
 
+  /**
+   * Updates a saved URL.
+   * @param {string} shortURL 
+   * @param {string} longURL 
+   * @param {string} userID 
+   */
   updateURL(shortURL, longURL, userID) {
     if (this.getUserID(shortURL) !== userID) {
       return false;
@@ -31,14 +62,6 @@ class Urls {
       this._urls[shortURL].longURL = longURL;
       return true;
     }
-  }
-
-  getLongURL(shortURL) {
-    return this._urls[shortURL].longURL;
-  }
-
-  getUserID(shortURL) {
-    return this._urls[shortURL].userID;
   }
 }
 
