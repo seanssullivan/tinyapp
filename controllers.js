@@ -3,15 +3,10 @@
 
 // Local Imports
 const Users = require('./models/users');
-const { generateRandomString } = require('./services');
-
-// Temporary
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xk": "http://www.google.com"
-};
+const Urls = require('./models/urls');
 
 const users = new Users();
+const urls = new Urls();
 
 /**
  * Retrieves TinyApp's index page.
@@ -40,7 +35,7 @@ const getLoginPage = (req, res) => {
 };
 
 /**
- * Manages POST requests for the login page.
+ * Manages POST requests to the login page.
  * @param {*} req - Request object.
  * @param {*} res - Response object.
  */
@@ -65,7 +60,7 @@ const postLoginPage = (req, res) => {
 };
 
 /**
- * Manages POST requests for the logout endpoint.
+ * Manages POST requests to the logout endpoint.
  * @param {*} req - Request object.
  * @param {*} res - Response object.
  */
@@ -84,16 +79,14 @@ const postLogout = (req, res) => {
 const getRegisterPage = (req, res) => {
   const userID = req.cookies["user_id"];
   const user = users.findUserByID(userID);
-  const templateVars = {
-    user,
-  };
+  const templateVars = { user };
   res
   .status(200)
   .render("pages/register", templateVars);
 };
 
 /**
- * Manages POST requests for the registration page.
+ * Manages POST requests to the registration page.
  * @param {*} req - Request object.
  * @param {*} res - Response object.
  */
@@ -123,16 +116,19 @@ const postRegisterPage = (req, res) => {
 const getUrlsPage = (req, res) => {
   const userID = req.cookies["user_id"];
   const user = users.findUserByID(userID);
-  const templateVars = {
-    user,
-    urls: urlDatabase
-  };
+  const templateVars = { user, urls };
   res.render("pages/urls_index", templateVars);
 };
 
+/**
+ * Manages POST requests to the URLs page.
+ * @param {*} req - Request object.
+ * @param {*} res - Response object.
+ */
 const postUrlsPage = (req, res) => {
-  const shortUrl = generateRandomString(6);
-  urlDatabase[shortUrl] = req.body.longURL;
+  const userID = req.cookies["user_id"];
+  const user = users.findUserByID(userID);
+  const shortUrl = urls.addURL(req.body.longURL, user.id);
   res.redirect(`/urls/${shortUrl}`);
 };
 
@@ -140,14 +136,23 @@ const postUrlsPage = (req, res) => {
  * Manages GET requests for the new-URL page.
  * @param {*} req - Request object.
  * @param {*} res - Response object.
+ * 
+ * If a user is not logged in, they will be redirected to the login page.
  */
 const getNewUrlPage = (req, res) => {
   const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
-  const templateVars = {
-    user
-  };
-  res.render("pages/urls_new", templateVars);
+  if (!userID) {
+    res
+    .status(401)
+    .redirect("/urls");
+
+  } else {
+    const user = users.findUserByID(userID);
+    const templateVars = { user };
+    res
+    .status(200)
+    .render("pages/urls_new", templateVars);
+  }
 };
 
 /**
@@ -159,25 +164,29 @@ const getUrlDetails = (req, res) => {
   const userID = req.cookies["user_id"];
   const user = users.findUserByID(userID);
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urls.getLongURL(shortURL);
 
-  const templateVars = {
-    user,
-    shortURL,
-    longURL,
-  };
+  const templateVars = { user, shortURL, longURL };
   res.render("pages/urls_show", templateVars);
 };
 
 /**
- * Manages POST requests for the edit-URL endpoint.
+ * Manages POST requests to the edit-URL endpoint.
  * @param {*} req - Request object.
  * @param {*} res - Response object.
  */
 const postEditUrlDetails = (req, res) => {
-  const shortUrl = req.params.shortURL;
-  urlDatabase[shortUrl] = req.body.longURL;
-  res.redirect(`/urls/${shortUrl}`);
+  const userID = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+  if (!userID || !shortURL || userID !== urls.getUserID(shortURL)) {
+    res
+    .status(401)
+    .redirect(`/urls/${shortURL}`);
+
+  } else {
+    urls.updateURL(shortURL, req.body.longURL, userID);
+    res.redirect(`/urls/${shortURL}`);
+  }
 };
 
 /**
@@ -186,9 +195,18 @@ const postEditUrlDetails = (req, res) => {
  * @param {*} res - Response object.
  */
 const postDeleteUrl = (req, res) => {
+  const userID = req.cookies["user_id"];
+  const user = users.findUserByID(userID);
   const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect("/urls");
+  const url = urls.getUserID(shortURL);
+  if (!user || user.id !== url.userID) {
+    res
+    .status(401)
+    .redirect("/urls");
+  } else {
+    delete urls[shortURL];
+    res.redirect("/urls");
+  }
 };
 
 // Follow ShortURL Redirect
@@ -199,7 +217,7 @@ const postDeleteUrl = (req, res) => {
  */
 const shortUrlRedirect = (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urls.getLongURL(shortURL);
   res.redirect(longURL);
 };
 
