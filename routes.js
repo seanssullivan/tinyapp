@@ -5,48 +5,48 @@
 const express = require('express');
 
 // Local Imports
-const views = require('./views');
+const controllers = require('./controllers');
 
 const router = express.Router();
 
 // Index Page
 router.route("/")
-.get(views.getIndexPage);
+.get(controllers.getIndexPage);
 
 // Login Request
 router.route("/login")
-.get(views.getLoginPage)
-.post(views.postLoginPage);
+.get(controllers.getLoginPage)
+.post(controllers.postLoginPage);
 
 // Logout Request
 router.route("/logout")
-.post(views.postLogout);
+.post(controllers.postLogout);
 
 // Registration Page
 router.route("/register")
-.get(views.getRegisterPage)
-.post(views.postRegisterPage);
+.get(controllers.getRegisterPage)
+.post(controllers.postRegisterPage);
 
 // URL Methods
 router.route("/urls")
-.get(views.getUrlsPage)
-.post(views.postUrlsPage);
+.get(controllers.getUrlsPage)
+.post(controllers.postUrlsPage);
 
 // New URL Request
 router.route("/urls/new")
-.get(views.getNewUrlPage);
+.get(controllers.getNewUrlPage);
 
 // URL Details Page
 router.route("/urls/:shortURL")
-.get(views.getUrlDetails)
-.post(views.postEditUrlDetails);
+.get(controllers.getUrlDetails)
+.post(controllers.postEditUrlDetails);
 
 // Delete URL Request
 router.route("/urls/:shortURL/delete")
-.post(views.postDeleteUrl);
+.post(controllers.postDeleteUrl);
 
 // Short URL Redirect
 router.route("/u/:shortURL")
-.get(views.shortUrlRedirect);
+.get(controllers.shortUrlRedirect);
 
 module.exports = router;
