@@ -19,9 +19,15 @@ const getIndexPage = (req, res) => {
 
 // Login Page
 const getLoginPage = (req, res) => {
+  const userID = req.cookies["user_id"];
+  const user = users.findUserByID(userID);
+  const templateVars = {
+    user,
+  };
+  
   res
   .status(200)
-  .render("pages/login");
+  .render("pages/login", templateVars);
 };
 
 const postLoginPage = (req, res) => {
