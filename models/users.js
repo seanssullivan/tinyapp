@@ -1,6 +1,10 @@
 // models/users.js
 
+// Node Imports
+const fs = require('fs');
+
 // Local Imports
+const cachedUsers = require('../cache/users.json') || {};
 const { generateRandomString } = require('../services');
 
 /**
@@ -8,19 +12,7 @@ const { generateRandomString } = require('../services');
  */
 class Users {
   constructor() {
-    this._users = {
-      // TODO: Remove example users.
-      "userRandomID": {
-        id: "userRandomID",
-        email: "user@example.com",
-        password: "purple-monkey-dinosaur"
-      },
-      "user2RandomID": {
-        id: "user2RandomID",
-        email: "user2@example.com",
-        password: "dishwasher-funk"
-      }
-    }
+    this._users = cachedUsers;
   };
 
   /**
@@ -36,6 +28,7 @@ class Users {
       password: userPassword
     }
     this._users[newUserID] = newUser;
+    this.writeToCache();
     return newUserID;
   }
 
@@ -61,6 +54,20 @@ class Users {
    */
   emailInUse(emailAddress) {
     return this.findUserByEmail(emailAddress) ? true : false;
+  }
+
+  /**
+   * Writes user data to JSON cache file.
+   */
+  writeToCache() {
+    const userData = JSON.stringify(this._users, null, 2);
+    fs.writeFile('cache/users.json', userData, (err) => {
+      if (err) {
+        console.log('Could not write users to cache:', err);
+      } else {
+        console.log('Users successfully written to cache.');
+      }
+    });
   }
 }
 

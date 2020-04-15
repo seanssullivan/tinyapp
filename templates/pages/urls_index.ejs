@@ -24,10 +24,10 @@
           </tr>
         </thead>
         <tbody>
-          <% for(let url in urls) { %>
+          <% for(let url of urls) { %>
             <tr>
-              <td><%= url %></td>
-              <td><%= urls.getLongURL(url) %></td>
+              <td><%= url.shortURL %></td>
+              <td><%= url.longURL %></td>
               <td><a class="btn btn-outline-primary btn-sm" href="/urls/<%= url %>">Edit</a></td>
               <td>
                 <form action="/urls/<%= url %>/delete" method="POST">

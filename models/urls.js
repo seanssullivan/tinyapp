@@ -1,13 +1,15 @@
 // models/urls.js
 
+// Node Imports
+const fs = require('fs');
+
+// Local Imports
+const cachedURLs = require('../cache/urls.json') || {};
 const { generateRandomString } = require('../services');
 
 class Urls {
   constructor() {
-    this._urls = {
-      "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: null },
-      "9sm5xk": { longURL: "http://www.google.com", userID: null }
-    };
+    this._urls = cachedURLs;
   }
 
   /**
@@ -42,10 +44,13 @@ class Urls {
   addURL(longURL, userID) {
     const shortURL = generateRandomString(6);
     const urlData = {
+      shortURL,
       longURL,
       userID
     }
     this._urls[shortURL] = urlData;
+    this.writeToCache();
+
     return shortURL;
   }
 
@@ -60,8 +65,23 @@ class Urls {
       return false;
     } else {
       this._urls[shortURL].longURL = longURL;
+      this.writeToCache();
       return true;
     }
+  }
+
+  /**
+   * Writes URL data to JSON cache file.
+   */
+  writeToCache() {
+    const urlData = JSON.stringify(this._urls, null, 2);
+    fs.writeFile('cache/urls.json', urlData, (err) => {
+      if (err) {
+        console.log('Could not write URLs to cache:', err);
+      } else {
+        console.log('URLs successfully written to cache.');
+      }
+    });
   }
 }
 

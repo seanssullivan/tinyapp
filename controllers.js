@@ -122,8 +122,8 @@ const postRegisterPage = (req, res) => {
 const getUrlsPage = (req, res) => {
   const userID = req.cookies["user_id"];
   const user = users.findUserByID(userID);
-  const availableURLS = urls.urlsForUser(userID);
-  const templateVars = { user, urls: availableURLS };
+  const availableURLs = urls.urlsForUser(userID);
+  const templateVars = { user, urls: availableURLs };
   res.render("pages/urls_index", templateVars);
 };
 
