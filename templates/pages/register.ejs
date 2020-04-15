@@ -13,7 +13,15 @@
     <%- include('../partials/_header') %>
 
     <main style="margin: 1em;">
-      
+      <form action="/register" method="POST">
+        <div class="form-group">
+          <label for="email"></label>
+          <input type="email" name="email" class="form-control" placeholder="Email">
+          <label for="password"></label>
+          <input type="password" name="password" class="form-control" placeholder="Password">
+          <button type="submit" class="btn btn-primary" style="margin: 1em 0em">Submit</button>
+        </div>
+      </form>
     </main>
 
     <!-- Bootstrap JS -->

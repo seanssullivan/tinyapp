@@ -15,12 +15,17 @@ router.route("/")
 
 // Login Request
 router.route("/login")
-.post(views.postLogin);
+.get(views.getLoginPage)
+.post(views.postLoginPage);
 
 // Logout Request
 router.route("/logout")
 .post(views.postLogout);
 
+// Registration Page
+router.route("/register")
+.get(views.getRegisterPage)
+.post(views.postRegisterPage);
 
 // URL Methods
 router.route("/urls")
