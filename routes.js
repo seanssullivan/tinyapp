@@ -9,11 +9,11 @@ const controllers = require('./controllers');
 
 const router = express.Router();
 
-// Index Page
+// Index Page Requests
 router.route("/")
 .get(controllers.getIndexPage);
 
-// Login Request
+// Login Page Requests
 router.route("/login")
 .get(controllers.getLoginPage)
 .post(controllers.postLoginPage);
@@ -22,21 +22,21 @@ router.route("/login")
 router.route("/logout")
 .post(controllers.postLogout);
 
-// Registration Page
+// Registration Page Requests
 router.route("/register")
 .get(controllers.getRegisterPage)
 .post(controllers.postRegisterPage);
 
-// URL Methods
+// URL Page Requests
 router.route("/urls")
 .get(controllers.getUrlsPage)
 .post(controllers.postUrlsPage);
 
-// New URL Request
+// New URL Page Requests
 router.route("/urls/new")
 .get(controllers.getNewUrlPage);
 
-// URL Details Page
+// URL Details Page Requests
 router.route("/urls/:shortURL")
 .get(controllers.getUrlDetails)
 .post(controllers.postEditUrlDetails);
@@ -45,7 +45,7 @@ router.route("/urls/:shortURL")
 router.route("/urls/:shortURL/delete")
 .post(controllers.postDeleteUrl);
 
-// Short URL Redirect
+// Short URL Redirect Requests
 router.route("/u/:shortURL")
 .get(controllers.shortUrlRedirect);
 
