@@ -34,7 +34,7 @@ const postLoginPage = (req, res) => {
   const user = users.findUserByEmail(req.body.email);
   if (!user || user.password !== req.body.password) {
     res
-    .status(400)
+    .status(403)
     .redirect("/login");
   } else {
     res
