@@ -1,5 +1,8 @@
 // middleware.js
 
+// Third Party Imports
+const bcrypt = require('bcrypt');
+
 /**
  * Checks user's credentials.
  * @param {object} users 
@@ -43,7 +46,7 @@ const authFromCookie = (req, users) => {
 const authFromLogin = (req, users) => {
   const user = users.findUserByEmail(req.body.email);
 
-  if (user.password === req.body.password) {
+  if (bcrypt.compareSync(req.body.password, user.password)) {
     return { id: user.id, email: user.email, authenticated: true };
   } else {
     return { id: user.id, email: user.id, authenticated: false };
@@ -59,7 +62,9 @@ const authFromRegistration = (req, users) => {
   if (users.emailInUse(req.body.email)) {
     return { id: null, email: req.body.email, authenticated: false };
   } else {
-    const user = users.addUser(req.body.email, req.body.password);
+    const { email, password } = req.body;
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const user = users.addUser(email, hashedPassword);
     return { id: user.id, email: user.email, authenticated: true };
   }
 };
