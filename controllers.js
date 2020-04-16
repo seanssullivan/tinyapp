@@ -8,8 +8,8 @@ const urls = new Urls();
 
 /**
  * Retrieves TinyApp's index page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const getIndexPage = (req, res) => {
   if (!req.user.id) {
@@ -21,8 +21,8 @@ const getIndexPage = (req, res) => {
 
 /**
  * Manages GET requests for the login page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const getLoginPage = (req, res) => {
   res
@@ -32,8 +32,8 @@ const getLoginPage = (req, res) => {
 
 /**
  * Manages POST requests to the login page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const postLoginPage = (req, res) => {
   if (!req.user.id || !req.user.email) {
@@ -54,8 +54,8 @@ const postLoginPage = (req, res) => {
 
 /**
  * Manages POST requests to the logout endpoint.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const postLogout = (req, res) => {
   res
@@ -66,8 +66,8 @@ const postLogout = (req, res) => {
 
 /**
  * Manages GET requests for the registration page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const getRegisterPage = (req, res) => {
   res
@@ -77,8 +77,8 @@ const getRegisterPage = (req, res) => {
 
 /**
  * Manages POST requests to the registration page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const postRegisterPage = (req, res) => {
   if (!req.user.id && !req.user.email) {
@@ -98,8 +98,8 @@ const postRegisterPage = (req, res) => {
 
 /**
  * Manages GET requests for the URLs page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const getUrlsPage = (req, res) => {
   const availableURLs = req.user.authenticated ? urls.urlsForUser(req.user.id) : [];
@@ -108,8 +108,8 @@ const getUrlsPage = (req, res) => {
 
 /**
  * Manages POST requests to the URLs page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const postUrlsPage = (req, res) => {
   if (req.user.id) {
@@ -122,8 +122,8 @@ const postUrlsPage = (req, res) => {
 
 /**
  * Manages GET requests for the new-URL page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  *
  * If a user is not logged in, they will be redirected to the login page.
  */
@@ -141,8 +141,8 @@ const getNewUrlPage = (req, res) => {
 
 /**
  * Manages GET requests for a URL's details page.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const getUrlDetails = (req, res) => {
   const shortURL = req.params.shortURL;
@@ -161,8 +161,8 @@ const getUrlDetails = (req, res) => {
 
 /**
  * Manages POST requests to the edit-URL endpoint.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const postEditUrlDetails = (req, res) => {
   const shortURL = req.params.shortURL;
@@ -180,8 +180,8 @@ const postEditUrlDetails = (req, res) => {
 
 /**
  * Manages POST requests for the delete-URL endpoint.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const postDeleteUrl = (req, res) => {
   const shortURL = req.params.shortURL;
@@ -200,8 +200,8 @@ const postDeleteUrl = (req, res) => {
 // Follow ShortURL Redirect
 /**
  * Redirects all visitors to a short URL to the associated long URL.
- * @param {*} req - Request object.
- * @param {*} res - Response object.
+ * @param {object} req - Request object.
+ * @param {object} res - Response object.
  */
 const shortUrlRedirect = (req, res) => {
   const shortURL = req.params.shortURL;
