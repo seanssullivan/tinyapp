@@ -7,8 +7,11 @@ const cookieParser = require('cookie-parser');
 
 // Local Imports
 const routes = require('./routes');
+const { authenticate } = require('./middleware');
+const Users = require('./models/users');
 
 const PORT = 8080;
+const users = new Users();
 
 const app = express();
 app.set("views", "templates");
@@ -17,6 +20,9 @@ app.set("views", "templates");
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// CUSTOM MIDDLEWARE
+app.use(authenticate(users));
 
 // ROUTES
 app.use('/', routes);

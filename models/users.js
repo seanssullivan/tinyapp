@@ -29,7 +29,7 @@ class Users {
     }
     this._users[newUserID] = newUser;
     this.writeToCache();
-    return newUserID;
+    return newUser;
   }
 
   /**

@@ -14,9 +14,7 @@ const urls = new Urls();
  * @param {*} res - Response object.
  */
 const getIndexPage = (req, res) => {
-  const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
-  if (!user) {
+  if (!req.user.id) {
     res.redirect("/login");
   } else {
     res.redirect("/urls");
@@ -29,15 +27,9 @@ const getIndexPage = (req, res) => {
  * @param {*} res - Response object.
  */
 const getLoginPage = (req, res) => {
-  const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
-  const templateVars = {
-    user,
-  };
-
   res
   .status(200)
-  .render("pages/login", templateVars);
+  .render("pages/login", { user: req.user });
 };
 
 /**
@@ -46,21 +38,18 @@ const getLoginPage = (req, res) => {
  * @param {*} res - Response object.
  */
 const postLoginPage = (req, res) => {
-  if (!req.body.email) {
+  if (!req.user.id || !req.user.email) {
     res
     .status(400)
     .redirect("/urls");
-  } 
-  
-  const user = users.findUserByEmail(req.body.email);
-  if (!user || user.password !== req.body.password) {
+  } else if (!req.user.authenticated) {
     res
     .status(403)
     .redirect("/login");
   } else {
     res
     .status(201)
-    .cookie("user_id", user.id)
+    .cookie("user_id", req.user.id)
     .redirect("/urls");
   }
 };
@@ -83,12 +72,9 @@ const postLogout = (req, res) => {
  * @param {*} res - Response object.
  */
 const getRegisterPage = (req, res) => {
-  const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
-  const templateVars = { user };
   res
   .status(200)
-  .render("pages/register", templateVars);
+  .render("pages/register", { user: req.user });
 };
 
 /**
@@ -97,19 +83,17 @@ const getRegisterPage = (req, res) => {
  * @param {*} res - Response object.
  */
 const postRegisterPage = (req, res) => {
-  const userEmail = req.body.email;
-  const userPassword = req.body.password;
-  if (!userEmail || !userPassword) {
+  if (!req.user.id && !req.user.email) {
     res
     .status(400)
     .redirect("/register");
-  } else if (users.emailInUse(userEmail)) {
-    res.status(400)
-    .redirect("/register");
-  } else {
-    const newUserID = users.addUser(userEmail, userPassword);
+  } else if (!req.user.id && req.user.email) {
     res
-    .cookie("user_id", newUserID)
+    .status(400)
+    .redirect("/register"); // TODO: Send back error message.
+  } else {
+    res
+    .cookie("user_id", req.user.id)
     .redirect("/urls"); 
   }
 };
@@ -120,11 +104,8 @@ const postRegisterPage = (req, res) => {
  * @param {*} res - Response object.
  */
 const getUrlsPage = (req, res) => {
-  const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
-  const availableURLs = urls.urlsForUser(userID);
-  const templateVars = { user, urls: availableURLs };
-  res.render("pages/urls_index", templateVars);
+  const availableURLs = req.user.authenticated ? urls.urlsForUser(req.user.id) : [];
+  res.render("pages/urls_index", { user: req.user, urls: availableURLs });
 };
 
 /**
@@ -133,10 +114,12 @@ const getUrlsPage = (req, res) => {
  * @param {*} res - Response object.
  */
 const postUrlsPage = (req, res) => {
-  const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
-  const shortUrl = urls.addURL(req.body.longURL, user.id);
-  res.redirect(`/urls/${shortUrl}`);
+  if (req.user.id) {
+    const shortUrl = urls.addURL(req.body.longURL, req.user.id);
+    res.redirect(`/urls/${shortUrl}`);
+  } else {
+    res.redirect("/urls");
+  }
 };
 
 /**
@@ -147,18 +130,14 @@ const postUrlsPage = (req, res) => {
  * If a user is not logged in, they will be redirected to the login page.
  */
 const getNewUrlPage = (req, res) => {
-  const userID = req.cookies["user_id"];
-  if (!userID) {
+  if (req.user.id) {
+    res
+    .status(200)
+    .render("pages/urls_new", { user: req.user });
+  } else {
     res
     .status(401)
     .redirect("/urls");
-
-  } else {
-    const user = users.findUserByID(userID);
-    const templateVars = { user };
-    res
-    .status(200)
-    .render("pages/urls_new", templateVars);
   }
 };
 
@@ -168,12 +147,17 @@ const getNewUrlPage = (req, res) => {
  * @param {*} res - Response object.
  */
 const getUrlDetails = (req, res) => {
-  const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
   const shortURL = req.params.shortURL;
+  const owner = urls.getUserID(shortURL);
   const longURL = urls.getLongURL(shortURL);
+  const templateVars = { shortURL, longURL, user: req.user};
+  
+  if (req.user.id === owner) {
+    templateVars.owner = true;
+  } else {
+    templateVars.owner = false;
+  }
 
-  const templateVars = { user, shortURL, longURL };
   res.render("pages/urls_show", templateVars);
 };
 
@@ -183,16 +167,16 @@ const getUrlDetails = (req, res) => {
  * @param {*} res - Response object.
  */
 const postEditUrlDetails = (req, res) => {
-  const userID = req.cookies.user_id;
   const shortURL = req.params.shortURL;
-  if (!userID || !shortURL || userID !== urls.getUserID(shortURL)) {
+  const owner = urls.getUserID(shortURL);
+
+  if (shortURL && req.user.id === owner) {
+    urls.updateURL(shortURL, req.body.longURL, userID);
+    res.redirect(`/urls/${shortURL}`);
+  } else {
     res
     .status(401)
     .redirect(`/urls/${shortURL}`);
-
-  } else {
-    urls.updateURL(shortURL, req.body.longURL, userID);
-    res.redirect(`/urls/${shortURL}`);
   }
 };
 
@@ -202,17 +186,16 @@ const postEditUrlDetails = (req, res) => {
  * @param {*} res - Response object.
  */
 const postDeleteUrl = (req, res) => {
-  const userID = req.cookies["user_id"];
-  const user = users.findUserByID(userID);
   const shortURL = req.params.shortURL;
-  const url = urls.getUserID(shortURL);
-  if (!user || user.id !== url.userID) {
+  const owner = urls.getUserID(shortURL);
+
+  if (req.user.id === owner) {
+    delete urls[shortURL];
+    res.redirect("/urls");
+  } else {
     res
     .status(401)
     .redirect("/urls");
-  } else {
-    delete urls[shortURL];
-    res.redirect("/urls");
   }
 };
 
