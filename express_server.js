@@ -8,12 +8,17 @@ const cookieSession = require('cookie-session');
 
 // Local Imports
 const settings = require('./settings.json');
-const routes = require('./routes');
-const { authenticate } = require('./middleware');
+const { authenticate } = require('./middleware/authenticate');
 const Users = require('./models/users');
 
+// Import Routers
+const mainRouter = require('./routes/main');
+const urlRouter = require('./routes/urls');
+
+// DATABASE
 const users = new Users();
 
+// APP SETUP
 const app = express();
 app.set("views", settings.VIEW_DIR);
 
@@ -23,7 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
-  keys: [],
+  keys: ["testkey1", "testkey2", "testkey3"],
   maxAge: 24 * 60 * 60 * 1000
 }));
 
@@ -31,7 +36,8 @@ app.use(cookieSession({
 app.use(authenticate(users));
 
 // ROUTES
-app.use('/', routes);
+app.use('/', mainRouter);
+app.use('/urls', urlRouter);
 
 // LISTENER
 app.listen(settings.PORT, () => {

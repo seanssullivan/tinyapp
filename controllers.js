@@ -57,9 +57,9 @@ const postLoginPage = (req, res) => {
  * @param {object} res - Response object.
  */
 const postLogout = (req, res) => {
+  req.session = null;
   res
     .status(201)
-    .clearCookie("user_id")
     .redirect("/urls");
 };
 
