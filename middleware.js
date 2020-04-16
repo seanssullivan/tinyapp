@@ -10,11 +10,14 @@ const bcrypt = require('bcrypt');
 const authenticate = (users) => {
   return (req, res, next) => {
     if (req.cookies.user_id) {
-      req.user = authFromCookie(req, users);
+      req.user = authFromCookie(req, res, users);
+
     } else if (req.body.email && req.body.password && req.url === "/login") {
-      req.user = authFromLogin(req, users);
+      req.user = authFromLogin(req, res, users);
+
     } else if (req.body.email && req.body.password && req.url === "/register") {
-      req.user = authFromRegistration(req, users);
+      req.user = authFromRegistration(req, res, users);
+
     } else {
       req.user = { id: null, email: null, authenticated: false };
     }
@@ -27,15 +30,17 @@ const authenticate = (users) => {
  * @param {object} req 
  * @param {object} users 
  */
-const authFromCookie = (req, users) => {
+const authFromCookie = (req, res, users) => {
   const userID = req.cookies.user_id;
   const user = users.findUserByID(userID);
 
+  let credentials;
   if (user) {
-    return { id: user.id, email: user.email, authenticated: true };
+    credentials = { id: user.id, email: user.email, authenticated: true };
   } else {
-    return { id: null, email: null, authenticated: false };
+    credentials = { id: null, email: null, authenticated: false };
   }
+  return credentials;
 };
 
 /**
@@ -43,14 +48,17 @@ const authFromCookie = (req, users) => {
  * @param {object} req 
  * @param {object} users 
  */
-const authFromLogin = (req, users) => {
+const authFromLogin = (req, res, users) => {
   const user = users.findUserByEmail(req.body.email);
 
+  let credentials;
   if (bcrypt.compareSync(req.body.password, user.password)) {
-    return { id: user.id, email: user.email, authenticated: true };
+    credentials = { id: user.id, email: user.email, authenticated: true };
+    res.cookie("user_id", req.user.id);
   } else {
-    return { id: user.id, email: user.id, authenticated: false };
+    credentials = { id: user.id, email: user.id, authenticated: false };
   }
+  return credentials;
 };
 
 /**
@@ -58,15 +66,17 @@ const authFromLogin = (req, users) => {
  * @param {object} req 
  * @param {object} users 
  */
-const authFromRegistration = (req, users) => {
+const authFromRegistration = (req, res, users) => {
+  let credentials;
   if (users.emailInUse(req.body.email)) {
-    return { id: null, email: req.body.email, authenticated: false };
+    credentials = { id: null, email: req.body.email, authenticated: false };
   } else {
     const { email, password } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
     const user = users.addUser(email, hashedPassword);
-    return { id: user.id, email: user.email, authenticated: true };
+    credentials = { id: user.id, email: user.email, authenticated: true };
   }
+  return credentials;
 };
 
 module.exports = { authenticate };

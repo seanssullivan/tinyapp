@@ -4,6 +4,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 
 // Local Imports
 const settings = require('./settings.json');
@@ -20,6 +21,11 @@ app.set("views", settings.VIEW_DIR);
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [],
+  maxAge: 24 * 60 * 60 * 1000
+}));
 
 // CUSTOM MIDDLEWARE
 app.use(authenticate(users));

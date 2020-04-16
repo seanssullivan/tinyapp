@@ -47,7 +47,6 @@ const postLoginPage = (req, res) => {
   } else {
     res
       .status(201)
-      .cookie("user_id", req.user.id)
       .redirect("/urls");
   }
 };
