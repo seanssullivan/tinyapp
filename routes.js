@@ -11,42 +11,42 @@ const router = express.Router();
 
 // Index Page Requests
 router.route("/")
-.get(controllers.getIndexPage);
+  .get(controllers.getIndexPage);
 
 // Login Page Requests
 router.route("/login")
-.get(controllers.getLoginPage)
-.post(controllers.postLoginPage);
+  .get(controllers.getLoginPage)
+  .post(controllers.postLoginPage);
 
 // Logout Request
 router.route("/logout")
-.post(controllers.postLogout);
+  .post(controllers.postLogout);
 
 // Registration Page Requests
 router.route("/register")
-.get(controllers.getRegisterPage)
-.post(controllers.postRegisterPage);
+  .get(controllers.getRegisterPage)
+  .post(controllers.postRegisterPage);
 
 // URL Page Requests
 router.route("/urls")
-.get(controllers.getUrlsPage)
-.post(controllers.postUrlsPage);
+  .get(controllers.getUrlsPage)
+  .post(controllers.postUrlsPage);
 
 // New URL Page Requests
 router.route("/urls/new")
-.get(controllers.getNewUrlPage);
+  .get(controllers.getNewUrlPage);
 
 // URL Details Page Requests
 router.route("/urls/:shortURL")
-.get(controllers.getUrlDetails)
-.post(controllers.postEditUrlDetails);
+  .get(controllers.getUrlDetails)
+  .post(controllers.postEditUrlDetails);
 
 // Delete URL Request
 router.route("/urls/:shortURL/delete")
-.post(controllers.postDeleteUrl);
+  .post(controllers.postDeleteUrl);
 
 // Short URL Redirect Requests
 router.route("/u/:shortURL")
-.get(controllers.shortUrlRedirect);
+  .get(controllers.shortUrlRedirect);
 
 module.exports = router;

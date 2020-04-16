@@ -2,10 +2,8 @@
 // Views handle retrieving information from the local database and rendering it into the page templates.
 
 // Local Imports
-const Users = require('./models/users');
 const Urls = require('./models/urls');
 
-const users = new Users();
 const urls = new Urls();
 
 /**
@@ -28,8 +26,8 @@ const getIndexPage = (req, res) => {
  */
 const getLoginPage = (req, res) => {
   res
-  .status(200)
-  .render("pages/login", { user: req.user });
+    .status(200)
+    .render("pages/login", { user: req.user });
 };
 
 /**
@@ -40,17 +38,17 @@ const getLoginPage = (req, res) => {
 const postLoginPage = (req, res) => {
   if (!req.user.id || !req.user.email) {
     res
-    .status(400)
-    .redirect("/urls");
+      .status(400)
+      .redirect("/urls");
   } else if (!req.user.authenticated) {
     res
-    .status(403)
-    .redirect("/login");
+      .status(403)
+      .redirect("/login");
   } else {
     res
-    .status(201)
-    .cookie("user_id", req.user.id)
-    .redirect("/urls");
+      .status(201)
+      .cookie("user_id", req.user.id)
+      .redirect("/urls");
   }
 };
 
@@ -61,9 +59,9 @@ const postLoginPage = (req, res) => {
  */
 const postLogout = (req, res) => {
   res
-  .status(201)
-  .clearCookie("user_id")
-  .redirect("/urls");
+    .status(201)
+    .clearCookie("user_id")
+    .redirect("/urls");
 };
 
 /**
@@ -73,8 +71,8 @@ const postLogout = (req, res) => {
  */
 const getRegisterPage = (req, res) => {
   res
-  .status(200)
-  .render("pages/register", { user: req.user });
+    .status(200)
+    .render("pages/register", { user: req.user });
 };
 
 /**
@@ -85,16 +83,16 @@ const getRegisterPage = (req, res) => {
 const postRegisterPage = (req, res) => {
   if (!req.user.id && !req.user.email) {
     res
-    .status(400)
-    .redirect("/register");
+      .status(400)
+      .redirect("/register");
   } else if (!req.user.id && req.user.email) {
     res
-    .status(400)
-    .redirect("/register"); // TODO: Send back error message.
+      .status(400)
+      .redirect("/register"); // TODO: Send back error message.
   } else {
     res
-    .cookie("user_id", req.user.id)
-    .redirect("/urls"); 
+      .cookie("user_id", req.user.id)
+      .redirect("/urls");
   }
 };
 
@@ -126,18 +124,18 @@ const postUrlsPage = (req, res) => {
  * Manages GET requests for the new-URL page.
  * @param {*} req - Request object.
  * @param {*} res - Response object.
- * 
+ *
  * If a user is not logged in, they will be redirected to the login page.
  */
 const getNewUrlPage = (req, res) => {
   if (req.user.id) {
     res
-    .status(200)
-    .render("pages/urls_new", { user: req.user });
+      .status(200)
+      .render("pages/urls_new", { user: req.user });
   } else {
     res
-    .status(401)
-    .redirect("/urls");
+      .status(401)
+      .redirect("/urls");
   }
 };
 
@@ -171,12 +169,12 @@ const postEditUrlDetails = (req, res) => {
   const owner = urls.getUserID(shortURL);
 
   if (shortURL && req.user.id === owner) {
-    urls.updateURL(shortURL, req.body.longURL, userID);
+    urls.updateURL(shortURL, req.body.longURL, req.user.id);
     res.redirect(`/urls/${shortURL}`);
   } else {
     res
-    .status(401)
-    .redirect(`/urls/${shortURL}`);
+      .status(401)
+      .redirect(`/urls/${shortURL}`);
   }
 };
 
@@ -194,8 +192,8 @@ const postDeleteUrl = (req, res) => {
     res.redirect("/urls");
   } else {
     res
-    .status(401)
-    .redirect("/urls");
+      .status(401)
+      .redirect("/urls");
   }
 };
 
@@ -225,4 +223,4 @@ module.exports = {
   postEditUrlDetails,
   postDeleteUrl,
   shortUrlRedirect
-}
+};

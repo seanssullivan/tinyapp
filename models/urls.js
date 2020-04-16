@@ -14,7 +14,7 @@ class Urls {
 
   /**
    * Returns the long URL for a given short URL.
-   * @param {string} shortURL 
+   * @param {string} shortURL
    */
   getLongURL(shortURL) {
     return this._urls[shortURL].longURL;
@@ -22,7 +22,7 @@ class Urls {
 
   /**
    * Returns the ID for the user who owns a given short URL.
-   * @param {string} shortURL 
+   * @param {string} shortURL
    */
   getUserID(shortURL) {
     return this._urls[shortURL].userID;
@@ -30,7 +30,7 @@ class Urls {
 
   /**
    * Returns all urls owned by user.
-   * @param {string} userID 
+   * @param {string} userID
    */
   urlsForUser(userID) {
     return Object.values(this._urls).filter(url => url.userID === userID);
@@ -38,8 +38,8 @@ class Urls {
 
   /**
    * Creates a new short URL.
-   * @param {string} longURL 
-   * @param {string} userID 
+   * @param {string} longURL
+   * @param {string} userID
    */
   addURL(longURL, userID) {
     const shortURL = generateRandomString(6);
@@ -47,7 +47,7 @@ class Urls {
       shortURL,
       longURL,
       userID
-    }
+    };
     this._urls[shortURL] = urlData;
     this.writeToCache();
 
@@ -56,9 +56,9 @@ class Urls {
 
   /**
    * Updates a saved URL.
-   * @param {string} shortURL 
-   * @param {string} longURL 
-   * @param {string} userID 
+   * @param {string} shortURL
+   * @param {string} longURL
+   * @param {string} userID
    */
   updateURL(shortURL, longURL, userID) {
     if (this.getUserID(shortURL) !== userID) {

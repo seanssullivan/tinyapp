@@ -13,12 +13,12 @@ const { generateRandomString } = require('../services');
 class Users {
   constructor() {
     this._users = cachedUsers;
-  };
+  }
 
   /**
    * Adds a user object to the array of users.
-   * @param {string} userEmail 
-   * @param {string} userPassword 
+   * @param {string} userEmail
+   * @param {string} userPassword
    */
   addUser(userEmail, userPassword) {
     const newUserID = generateRandomString(8);
@@ -26,7 +26,7 @@ class Users {
       id: newUserID,
       email: userEmail,
       password: userPassword
-    }
+    };
     this._users[newUserID] = newUser;
     this.writeToCache();
     return newUser;
@@ -34,7 +34,7 @@ class Users {
 
   /**
    * Returns the user object for a specific user id.
-   * @param {string} userID 
+   * @param {string} userID
    */
   findUserByID(userID) {
     return this._users[userID];
@@ -42,7 +42,7 @@ class Users {
 
   /**
    * Searches the array of users for a user object with a matching email address.
-   * @param {string} emailAddress 
+   * @param {string} emailAddress
    */
   findUserByEmail(emailAddress) {
     return Object.values(this._users).find(user => user.email === emailAddress);
@@ -50,7 +50,7 @@ class Users {
 
   /**
    * Checks whether an email address is already in use by another user.
-   * @param {string} emailAddress 
+   * @param {string} emailAddress
    */
   emailInUse(emailAddress) {
     return this.findUserByEmail(emailAddress) ? true : false;
