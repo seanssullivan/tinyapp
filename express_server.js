@@ -6,15 +6,15 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // Local Imports
+const settings = require('./settings.json');
 const routes = require('./routes');
 const { authenticate } = require('./middleware');
 const Users = require('./models/users');
 
-const PORT = 8080;
 const users = new Users();
 
 const app = express();
-app.set("views", "templates");
+app.set("views", settings.VIEW_DIR);
 
 // MIDDLEWARE
 app.set('view engine', 'ejs');
@@ -28,6 +28,6 @@ app.use(authenticate(users));
 app.use('/', routes);
 
 // LISTENER
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+app.listen(settings.PORT, () => {
+  console.log(`Example app listening on port ${settings.PORT}!`);
 });
