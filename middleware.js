@@ -1,5 +1,9 @@
 // middleware.js
 
+/**
+ * Checks user's credentials.
+ * @param {object} users 
+ */
 const authenticate = (users) => {
   return (req, res, next) => {
     if (req.cookies.user_id) {
@@ -15,6 +19,11 @@ const authenticate = (users) => {
   };
 };
 
+/**
+ * Verifies a user's id from their cookie.
+ * @param {object} req 
+ * @param {object} users 
+ */
 const authFromCookie = (req, users) => {
   const userID = req.cookies.user_id;
   const user = users.findUserByID(userID);
@@ -26,6 +35,11 @@ const authFromCookie = (req, users) => {
   }
 };
 
+/**
+ * Verifies a user's login credentials.
+ * @param {object} req 
+ * @param {object} users 
+ */
 const authFromLogin = (req, users) => {
   const user = users.findUserByEmail(req.body.email);
 
@@ -36,6 +50,11 @@ const authFromLogin = (req, users) => {
   }
 };
 
+/**
+ * Confirms a user's email and password when registering.
+ * @param {object} req 
+ * @param {object} users 
+ */
 const authFromRegistration = (req, users) => {
   if (users.emailInUse(req.body.email)) {
     return { id: null, email: req.body.email, authenticated: false };

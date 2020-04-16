@@ -1,4 +1,4 @@
 {
   "PORT": "8080",
-  "VIEW_DIR": "/templates"
+  "VIEW_DIR": "templates"
 }
