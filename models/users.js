@@ -4,15 +4,14 @@
 const fs = require('fs');
 
 // Local Imports
-const cachedUsers = require('../cache/users.json') || {};
 const { generateRandomString } = require('../services');
 
 /**
  * User object manages all user information.
  */
 class Users {
-  constructor() {
-    this._users = cachedUsers;
+  constructor(userData) {
+    this._users = userData;
   }
 
   /**

@@ -4,12 +4,11 @@
 const fs = require('fs');
 
 // Local Imports
-const cachedURLs = require('../cache/urls.json') || {};
 const { generateRandomString } = require('../services');
 
 class Urls {
-  constructor() {
-    this._urls = cachedURLs;
+  constructor(urlsData) {
+    this._urls = urlsData;
   }
 
   /**

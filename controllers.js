@@ -2,9 +2,10 @@
 // Views handle retrieving information from the local database and rendering it into the page templates.
 
 // Local Imports
+const cachedURLs = require('./cache/urls.json');
 const Urls = require('./models/urls');
 
-const urls = new Urls();
+const urls = new Urls(cachedURLs);
 
 /**
  * Retrieves TinyApp's index page.

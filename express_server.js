@@ -9,14 +9,15 @@ const cookieSession = require('cookie-session');
 // Local Imports
 const settings = require('./settings.json');
 const { authenticate } = require('./middleware/authenticate');
+const cachedUsers = require('./cache/users.json');
 const Users = require('./models/users');
 
 // Import Routers
 const mainRouter = require('./routes/main');
 const urlRouter = require('./routes/urls');
 
-// DATABASE
-const users = new Users();
+// DATABASES
+const users = new Users(cachedUsers);
 
 // APP SETUP
 const app = express();

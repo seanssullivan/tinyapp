@@ -27,4 +27,8 @@ router.route("/register")
   .get(controllers.getRegisterPage)
   .post(controllers.postRegisterPage);
 
+// Short URL Redirect Requests
+router.route("/u/:shortURL")
+  .get(controllers.shortUrlRedirect);
+
 module.exports = router;
