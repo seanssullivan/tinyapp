@@ -32,7 +32,7 @@ class Urls {
 
   /**
    * Returns a url object for a provided shortURL.
-   * @param {string} shortURL 
+   * @param {string} shortURL
    */
   getURL(shortURL) {
     const url = this._urls[shortURL];
@@ -61,11 +61,11 @@ class Urls {
 
   /**
    * Increments the click count for a url.
-   * @param {string} shortURL 
-   * @param {string} clickID 
+   * @param {string} shortURL
+   * @param {string} clickID
    */
   incrementClicks(shortURL, clickID) {
-    const url = this._urls[shortURL]
+    const url = this._urls[shortURL];
     if (!url.clicks[clickID]) {
       url.clicks[clickID] = 1;
     } else {
@@ -76,17 +76,17 @@ class Urls {
 
   /**
    * Calculates the total number of clicks for a url.
-   * @param {string} shortURL 
+   * @param {string} shortURL
    */
   totalClicks(shortURL) {
     const url = this._urls[shortURL];
-    const clickCount = Object.values(url.clicks).reduce((total, curr) => total + curr, 0)
+    const clickCount = Object.values(url.clicks).reduce((total, curr) => total + curr, 0);
     return clickCount;
   }
 
   /**
    * Calculates the total number of unique clicks for a url.
-   * @param {string} shortUrl 
+   * @param {string} shortUrl
    */
   uniqueClicks(shortURL) {
     const url = this._urls[shortURL];

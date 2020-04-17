@@ -32,10 +32,10 @@ const getLoginPage = (req, res) => {
     res
       .status(200)
       .render("pages/login", { user: req.user });
-  } else { 
-      res
-    .status(307)
-    .redirect('/urls');
+  } else {
+    res
+      .status(307)
+      .redirect('/urls');
   }
 };
 
@@ -78,7 +78,7 @@ const getRegisterPage = (req, res) => {
     res
       .status(200)
       .render("pages/register", { user: req.user });
-  }  else { 
+  }  else {
     res
       .status(307)
       .redirect('/urls');

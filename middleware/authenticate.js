@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 /**
  * Checks user's credentials.
- * @param {object} users 
+ * @param {object} users
  */
 const authenticate = (users) => {
   return (req, res, next) => {
@@ -33,8 +33,8 @@ const authenticate = (users) => {
 
 /**
  * Verifies a user's id from their cookie.
- * @param {object} req 
- * @param {object} users 
+ * @param {object} req
+ * @param {object} users
  */
 const authFromCookie = (req, users) => {
   const userID = req.session.user_id;
@@ -62,8 +62,8 @@ const authFromCookie = (req, users) => {
 
 /**
  * Verifies a user's login credentials.
- * @param {object} req 
- * @param {object} users 
+ * @param {object} req
+ * @param {object} users
  */
 const authFromLogin = (req, users) => {
   const user = users.findUserByEmail(req.body.email);
@@ -105,8 +105,8 @@ const authFromLogin = (req, users) => {
 
 /**
  * Confirms a user's email and password when registering.
- * @param {object} req 
- * @param {object} users 
+ * @param {object} req
+ * @param {object} users
  */
 const authFromRegistration = (req, users) => {
   let credentials;
