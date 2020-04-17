@@ -13,7 +13,7 @@ const urls = new Urls(cachedURLs);
  * @param {object} res - Response object.
  */
 const getIndexPage = (req, res) => {
-  if (!req.user.id || !req.user.authenticated) {
+  if (!req.user) {
     // If user is not logged in, redirect to /login
     res.redirect("/login");
   } else {
@@ -28,10 +28,10 @@ const getIndexPage = (req, res) => {
  * @param {object} res - Response object.
  */
 const getLoginPage = (req, res) => {
-  if (!req.user.authenticated) {
+  if (!req.user) {
     res
       .status(200)
-      .render("pages/login", { user: req.user });
+      .render("pages/login", { user: req.user, errors: req.errors });
   } else {
     res
       .status(307)
@@ -45,10 +45,10 @@ const getLoginPage = (req, res) => {
  * @param {object} res - Response object.
  */
 const postLoginPage = (req, res) => {
-  if (!req.user.authenticated) {
+  if (!req.user) {
     res
       .status(401)
-      .render("pages/login", { user: req.user });
+      .render("pages/login", { user: req.user, errors: req.errors });
   } else {
     res
       .status(200)
@@ -74,10 +74,10 @@ const postLogout = (req, res) => {
  * @param {object} res - Response object.
  */
 const getRegisterPage = (req, res) => {
-  if (!req.user.authenticated) {
+  if (!req.user) {
     res
       .status(200)
-      .render("pages/register", { user: req.user });
+      .render("pages/register", { user: req.user, errors: req.errors });
   }  else {
     res
       .status(307)
@@ -91,14 +91,10 @@ const getRegisterPage = (req, res) => {
  * @param {object} res - Response object.
  */
 const postRegisterPage = (req, res) => {
-  if (!req.user.id && !req.user.email) {
+  if (!req.user) {
     res
       .status(400)
-      .render("pages/register", { user: req.user });
-  } else if (!req.user.id && req.user.email) {
-    res
-      .status(400)
-      .render("pages/register", { user: req.user });
+      .render("pages/register", { user: req.user, errors: req.errors });
   } else {
     res
       .cookie("user_id", req.user.id)
@@ -112,8 +108,17 @@ const postRegisterPage = (req, res) => {
  * @param {object} res - Response object.
  */
 const getUrlsPage = (req, res) => {
-  const availableURLs = urls.urlsForUser(req.user.id);
-  res.render("pages/urls_index", { user: req.user, urls: availableURLs });
+  if (req.user) {
+    res.render("pages/urls_index", {
+      user: req.user,
+      urls: urls.urlsForUser(req.user.id)
+    });
+  } else {
+    res.render("pages/urls_index", {
+      user: req.user,
+      urls: null
+    });
+  }
 };
 
 /**
@@ -122,7 +127,7 @@ const getUrlsPage = (req, res) => {
  * @param {object} res - Response object.
  */
 const postUrlsPage = (req, res) => {
-  if (req.user.id) {
+  if (req.user) {
     const url = urls.addURL(req.body.longURL, req.user.id);
     res.redirect(`/urls/${url.shortURL}`);
   } else {
@@ -138,7 +143,7 @@ const postUrlsPage = (req, res) => {
  * If a user is not logged in, they will be redirected to the login page.
  */
 const getNewUrlPage = (req, res) => {
-  if (req.user.id) {
+  if (req.user) {
     res
       .status(200)
       .render("pages/urls_new", { user: req.user });
@@ -155,33 +160,9 @@ const getNewUrlPage = (req, res) => {
  * @param {object} res - Response object.
  */
 const getUrlDetails = (req, res) => {
-  const shortURL = req.params.shortURL;
-  const url = urls.getURL(shortURL);
-
-  let templateVars;
-  if (!url) {
-    templateVars = {
-      shortURL: null,
-      longURL: null,
-      totalClicks: null,
-      uniqueClicks: null,
-      owner: false,
-      user: req.user
-    };
-
-  } else {
-    const owner = urls.getUserID(shortURL);
-    templateVars = {
-      shortURL: url.shortURL,
-      longURL: url.longURL,
-      totalClicks: url.totalClicks,
-      uniqueClicks: url.uniqueClicks,
-      owner: req.user.id === owner,
-      user: req.user
-    };
-  }
-
-  res.render("pages/urls_show", templateVars);
+  const url = urls.getURL(req.params.shortURL);
+  console.log(req.user.id, url);
+  res.render("pages/urls_show", { url, user: req.user });
 };
 
 /**
@@ -191,10 +172,10 @@ const getUrlDetails = (req, res) => {
  */
 const editUrlDetails = (req, res) => {
   const shortURL = req.params.shortURL;
-  const owner = urls.getUserID(shortURL);
+  const url = urls.getURL(shortURL);
 
-  if (shortURL && req.user.id === owner) {
-    urls.updateURL(shortURL, req.body.longURL, req.user.id);
+  if (shortURL && req.user && req.user.id === url.owner) {
+    url.longURL = req.body.longURL;
     res.redirect(`/urls/${shortURL}`);
   } else {
     res
@@ -210,11 +191,12 @@ const editUrlDetails = (req, res) => {
  */
 const deleteUrl = (req, res) => {
   const shortURL = req.params.shortURL;
-  const owner = urls.getUserID(shortURL);
+  const url = urls.getURL(shortURL);
 
-  if (req.user.id === owner) {
-    delete urls[shortURL];
+  if (shortURL && req.user && req.user.id === url.owner) {
+    urls.deleteURL(shortURL);
     res.redirect("/urls");
+
   } else {
     res
       .status(401)
@@ -230,12 +212,12 @@ const deleteUrl = (req, res) => {
  */
 const shortUrlRedirect = (req, res) => {
   const shortURL = req.params.shortURL;
-  const urlObj = urls.getURL(shortURL);
+  const url = urls.getURL(shortURL);
 
-  if (urlObj) {
+  if (url) {
     const clickID = req.session.user_id || req.ip;
-    urls.incrementClicks(shortURL, clickID);
-    res.redirect(urlObj.longURL);
+    url.addClick(clickID);
+    res.redirect(url.longURL);
   } else {
     res.redirect(`/urls/${shortURL}`);
   }

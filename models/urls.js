@@ -22,76 +22,20 @@ class Urls {
     const urlData = {
       shortURL,
       longURL,
-      userID,
-      clicks: {}
+      userID
     };
-    this._urls[shortURL] = urlData;
+    const newURL = new Url(urlData);
+    this._urls[shortURL] = newURL;
     this.writeToCache();
-    return urlData;
+    return newURL;
   }
 
   /**
-   * Returns a url object for a provided shortURL.
+   * Returns a url object for a provided short URL.
    * @param {string} shortURL
    */
   getURL(shortURL) {
-    const url = this._urls[shortURL];
-    return Object.assign({}, {
-      totalClicks: this.totalClicks(url.shortURL),
-      uniqueClicks: this.uniqueClicks(url.shortURL),
-      ...url
-    });
-  }
-
-  /**
-   * Updates a saved URL.
-   * @param {string} shortURL
-   * @param {string} longURL
-   * @param {string} userID
-   */
-  updateURL(shortURL, longURL, userID) {
-    if (this.getUserID(shortURL) !== userID) {
-      return false;
-    } else {
-      this._urls[shortURL].longURL = longURL;
-      this.writeToCache();
-      return true;
-    }
-  }
-
-  /**
-   * Increments the click count for a url.
-   * @param {string} shortURL
-   * @param {string} clickID
-   */
-  incrementClicks(shortURL, clickID) {
-    const url = this._urls[shortURL];
-    if (!url.clicks[clickID]) {
-      url.clicks[clickID] = 1;
-    } else {
-      url.clicks[clickID]++;
-    }
-    this.writeToCache();
-  }
-
-  /**
-   * Calculates the total number of clicks for a url.
-   * @param {string} shortURL
-   */
-  totalClicks(shortURL) {
-    const url = this._urls[shortURL];
-    const clickCount = Object.values(url.clicks).reduce((total, curr) => total + curr, 0);
-    return clickCount;
-  }
-
-  /**
-   * Calculates the total number of unique clicks for a url.
-   * @param {string} shortUrl
-   */
-  uniqueClicks(shortURL) {
-    const url = this._urls[shortURL];
-    const clickCount = Object.keys(url.clicks).length;
-    return clickCount;
+    return this._urls[shortURL];
   }
 
   /**
@@ -100,11 +44,7 @@ class Urls {
    */
   getLongURL(shortURL) {
     const url = this._urls[shortURL];
-    if (url) {
-      return url.longURL;
-    } else {
-      return undefined;
-    }
+    if (url) return url.longURL;
   }
 
   /**
@@ -113,11 +53,15 @@ class Urls {
    */
   getUserID(shortURL) {
     const url = this._urls[shortURL];
-    if (url) {
-      return url.userID;
-    } else {
-      return undefined;
-    }
+    if (url) return url.userID;
+  }
+
+  /**
+   * Deletes a short URL.
+   * @param {string} shortURL 
+   */
+  deleteURL(shortURL) {
+    delete this._data[shortURL];
   }
 
   /**
@@ -126,12 +70,7 @@ class Urls {
    */
   urlsForUser(userID) {
     return Object.values(this._urls)
-      .filter(url => url.userID === userID)
-      .map((url) => Object.assign({}, {
-        totalClicks: this.totalClicks(url.shortURL),
-        uniqueClicks: this.uniqueClicks(url.shortURL),
-        ...url
-      }));
+      .filter(url => url.userID === userID);
   }
 
   /**
@@ -148,6 +87,64 @@ class Urls {
         }
       });
     }
+  }
+}
+
+class Url {
+  constructor(urlData) {
+    this._data = {
+      shortURL: urlData.shortURL,
+      longURL: urlData.longURL,
+      userID: urlData.userID,
+      clicks: {}
+    } 
+  }
+
+  get shortURL() {
+    return this._data.shortURL;
+  }
+
+  get longURL() {
+    return this._data.longURL;
+  }
+
+  set longURL(newURL) {
+    this._data.longURL = newURL;
+  }
+
+  get owner() {
+    return this._data.userID;
+  }
+
+  /**
+   * Calculates the total number of clicks for a url.
+   */
+  get totalClicks() {
+    const clickCount = Object
+      .values(this._data.clicks)
+      .reduce((total, dates) => total + dates.length, 0);
+    return clickCount;
+  }
+
+  /**
+   * Calculates the total number of unique clicks for a url.
+   */
+  get uniqueClicks() {
+    const clickCount = Object.keys(this._data.clicks).length;
+    return clickCount;
+  }
+
+  /**
+   * Adds a click to the url data.
+   * @param {string} shortURL
+   * @param {string} visitorID
+   */
+  addClick(visitorID) {
+    const clicks = this._data.clicks;
+    if (!clicks[visitorID]) {
+      clicks[visitorID] = [];
+    }
+    clicks[visitorID].push(new Date());
   }
 }
 

@@ -10,11 +10,15 @@ const bcrypt = require('bcrypt');
 const { generateRandomString } = require('../services');
 
 /**
- * User object manages all user information.
+ * Users object manages all user information.
  */
 class Users {
   constructor(userData, disableCache = false) {
-    this._users = userData;
+    this._users = {};
+    for (const userID in userData) {
+      this._users[userID] = new User(userData[userID]);
+    }
+
     this._disableCache = disableCache;
   }
 
@@ -23,8 +27,8 @@ class Users {
    * @param {string} userEmail
    * @param {string} userPassword
    */
-  addUser(userEmail, userPassword) {
-    const newUser = new User(userEmail, userPassword);
+  addUser(email, password) {
+    const newUser = new User({ email, password });
     this._users[newUser.id] = newUser;
     if (!this._disableCache) this.writeToCache();
     return newUser;
@@ -70,28 +74,48 @@ class Users {
 }
 
 class User {
-  constructor(userEmail, userPassword) {
-    this.data = {
-      id: generateRandomString(8),
-      email: userEmail,
-      password: bcrypt.hashSync(userPassword, 10)
+  constructor(userData) {
+    if (userData["data"]) {
+      this.data = userData.data;
+
+    } else {
+      console.log(userData["password"]);
+      this.data = {
+        id: generateRandomString(8),
+        email: userData["email"],
+        password: bcrypt.hashSync(userData["password"], 10),
+        date_created: new Date()
+      }
     }
   }
 
+  /**
+   * Get method for retrieving the stored ID.
+   */
   get id() {
     return this.data.id;
   }
 
+  /**
+   * Get method for retrieving the stored email address.
+   */
   get email() {
     return this.data.email;
   }
 
+  /**
+   * Get method for retrieving the stored hashed password.
+   */
   get password() {
     return this.data.password;
   }
 
+  /**
+   * Checks the provided password against the hashed password.
+   * @param {string} password 
+   */
   confirmPassword(password) {
-    return bcrypt.compareSync(password, this.password);
+    return bcrypt.compareSync(password, this.data.password);
   }
 }
 

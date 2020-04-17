@@ -1,7 +1,4 @@
-// middleware.js
-
-// Third Party Imports
-const bcrypt = require('bcrypt');
+// middleware/authenticate.js
 
 /**
  * Checks user's credentials.
@@ -9,23 +6,19 @@ const bcrypt = require('bcrypt');
  */
 const authenticate = (users) => {
   return (req, res, next) => {
+    req.user = null;
+    req.errors = { email: null, password: null, view: null };
+
     if (req.session.user_id) {
-      req.user = authFromCookie(req, users);
+      authFromCookie(req, users);
 
     } else if (req.originalUrl === "/login" && req.method === "POST") {
-      req.user = authFromLogin(req, users);
+      authFromLogin(req, users);
 
     } else if (req.originalUrl === "/register" && req.method === "POST") {
-      req.user = authFromRegistration(req, users);
-
-    } else {
-      req.user = {
-        id: null,
-        email: null,
-        authenticated: false,
-        error: { email: null, password: null }
-      };
+      authFromRegistration(req, users);
     }
+
     next();
   };
 };
@@ -39,24 +32,11 @@ const authFromCookie = (req, users) => {
   const userID = req.session.user_id;
   const user = users.findUserByID(userID);
 
-  let credentials;
   if (user) {
-    credentials = {
-      id: user.id,
-      email: user.email,
-      authenticated: true,
-      error: null
-    };
-
-  } else {
-    credentials = {
-      id: null,
-      email: null,
-      authenticated: false,
-      error: null
-    };
+    req.user = user;
   }
-  return credentials;
+
+  return;
 };
 
 /**
@@ -67,39 +47,21 @@ const authFromCookie = (req, users) => {
 const authFromLogin = (req, users) => {
   const user = users.findUserByEmail(req.body.email);
 
-  let credentials;
   if (!req.body.email) {
-    credentials = {
-      id: null,
-      email: null,
-      authenticated: false,
-      error: { email: "please enter an email address", password: null }
-    };
+    req.errors.email = "please enter an email address";
+
   } else if (!req.body.password) {
-    credentials = {
-      id: null,
-      email: null,
-      authenticated: false,
-      error: { email: null, password: "please enter a password" }
-    };
-  } else if (user && bcrypt.compareSync(req.body.password, user.password)) {
+    req.errors.password = "please enter a password";
+
+  } else if (user && user.confirmPassword(req.body.password)) {
     req.session.user_id = user.id;
-    credentials = {
-      id: user.id,
-      email: user.email,
-      authenticated: true,
-      error: { email: null, password: null }
-    };
+    req.user = user;
+
   } else {
-    credentials = {
-      id: null,
-      email: null,
-      authenticated: false,
-      error: { email: null, password: "No account found for that email and password" }
-    };
+    req.errors.password = "No account found for that email and password";
 
   }
-  return credentials;
+  return;
 };
 
 /**
@@ -108,46 +70,23 @@ const authFromLogin = (req, users) => {
  * @param {object} users
  */
 const authFromRegistration = (req, users) => {
-  let credentials;
   if (!req.body.email) {
-    credentials = {
-      id: null,
-      email: null,
-      authenticated: false,
-      error: { email: "please enter an email address", password: null }
-    };
+    req.errors.email = "please enter an email address";
 
   } else if (!req.body.password) {
-    credentials = {
-      id: null,
-      email: null,
-      authenticated: false,
-      error: { email: null, password: "please enter a password" }
-    };
+    req.errors.password = "please enter a password";
 
   } else if (users.emailInUse(req.body.email)) {
-    credentials = {
-      id: null,
-      email: req.body.email,
-      authenticated: false,
-      error: { email: "email already in use", password: null }
-    };
-
+    req.errors.email = "email already in use";
 
   } else {
     const { email, password } = req.body;
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const user = users.addUser(email, hashedPassword);
+    const user = users.addUser(email, password);
 
     req.session.user_id = user.id;
-    credentials = {
-      id: user.id,
-      email: user.email,
-      authenticated: true,
-      error: null
-    };
+    req.user = user;
   }
-  return credentials;
+  return;
 };
 
 module.exports = { authenticate };
