@@ -8,7 +8,10 @@ const { generateRandomString } = require('../services');
 
 class Urls {
   constructor(urlsData, disableCache = false) {
-    this._urls = urlsData;
+    this._urls = {};
+    for (let url in urlsData) {
+      this._urls[url] = new Url(urlsData[url]);
+    }
     this._disableCache = disableCache;
   }
 
@@ -62,7 +65,7 @@ class Urls {
    * @param {string} shortURL 
    */
   deleteURL(shortURL) {
-    delete this._data[shortURL];
+    delete this._urls[shortURL];
   }
 
   /**
@@ -93,12 +96,16 @@ class Urls {
 
 class Url {
   constructor(urlData) {
-    this._data = {
-      shortURL: urlData.shortURL,
-      longURL: urlData.longURL,
-      userID: urlData.userID,
-      clicks: {}
-    } 
+    if (urlData.hasOwnProperty("_data")) {
+      this._data = urlData._data;
+    } else {
+      this._data = {
+        shortURL: urlData.shortURL,
+        longURL: urlData.longURL,
+        userID: urlData.userID,
+        clicks: {}
+      }
+    }
   }
 
   get shortURL() {

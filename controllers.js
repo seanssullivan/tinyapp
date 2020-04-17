@@ -190,9 +190,9 @@ const editUrlDetails = (req, res) => {
  */
 const deleteUrl = (req, res) => {
   const shortURL = req.params.shortURL;
-  const url = urls.getURL(shortURL);
+  const owner = urls.getUserID(shortURL);
 
-  if (shortURL && req.user && req.user.id === url.owner) {
+  if (shortURL && req.user && req.user.id === owner) {
     urls.deleteURL(shortURL);
     res.redirect("/urls");
 
