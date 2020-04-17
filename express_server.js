@@ -3,6 +3,7 @@
 // Third Party Imports
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const methodOverride = require('method-override');
 
@@ -27,6 +28,7 @@ app.set("views", settings.VIEW_DIR);
 app.set('view engine', 'ejs');
 app.use(methodOverride('_method'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ["testkey1", "testkey2", "testkey3"],
