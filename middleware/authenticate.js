@@ -83,7 +83,7 @@ const authFromLogin = (req, users) => {
       authenticated: false,
       error: { email: null, password: "please enter a password" }
     };
-  } else if (bcrypt.compareSync(req.body.password, user.password)) {
+  } else if (user && bcrypt.compareSync(req.body.password, user.password)) {
     req.session.user_id = user.id;
     credentials = {
       id: user.id,
@@ -93,10 +93,10 @@ const authFromLogin = (req, users) => {
     };
   } else {
     credentials = {
-      id: user.id,
-      email: user.id,
+      id: null,
+      email: null,
       authenticated: false,
-      error: { email: null, password: "Email and password do not match an existing " }
+      error: { email: null, password: "No account found for that email and password" }
     };
 
   }
