@@ -161,7 +161,6 @@ const getNewUrlPage = (req, res) => {
  */
 const getUrlDetails = (req, res) => {
   const url = urls.getURL(req.params.shortURL);
-  console.log(req.user.id, url);
   res.render("pages/urls_show", { url, user: req.user });
 };
 
