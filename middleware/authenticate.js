@@ -9,7 +9,6 @@ const bcrypt = require('bcrypt');
  */
 const authenticate = (users) => {
   return (req, res, next) => {
-    console.log(req.method);
     if (req.session.user_id) {
       req.user = authFromCookie(req, users);
 
