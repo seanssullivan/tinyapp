@@ -21,10 +21,7 @@ router.route("/new")
 // URL Details Page Requests
 router.route("/:shortURL")
   .get(controllers.getUrlDetails)
-  .post(controllers.postEditUrlDetails);
-
-// Delete URL Request
-router.route("/:shortURL/delete")
-  .post(controllers.postDeleteUrl);
+  .put(controllers.editUrlDetails)
+  .delete(controllers.deleteUrl);
 
 module.exports = router;

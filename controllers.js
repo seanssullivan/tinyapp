@@ -189,7 +189,7 @@ const getUrlDetails = (req, res) => {
  * @param {object} req - Request object.
  * @param {object} res - Response object.
  */
-const postEditUrlDetails = (req, res) => {
+const editUrlDetails = (req, res) => {
   const shortURL = req.params.shortURL;
   const owner = urls.getUserID(shortURL);
 
@@ -208,7 +208,7 @@ const postEditUrlDetails = (req, res) => {
  * @param {object} req - Request object.
  * @param {object} res - Response object.
  */
-const postDeleteUrl = (req, res) => {
+const deleteUrl = (req, res) => {
   const shortURL = req.params.shortURL;
   const owner = urls.getUserID(shortURL);
 
@@ -252,7 +252,7 @@ module.exports = {
   postUrlsPage,
   getNewUrlPage,
   getUrlDetails,
-  postEditUrlDetails,
-  postDeleteUrl,
+  editUrlDetails,
+  deleteUrl,
   shortUrlRedirect
 };

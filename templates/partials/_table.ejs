@@ -19,7 +19,7 @@
           <td><%= url.uniqueClicks %></td>
           <td><a class="btn btn-outline-primary btn-sm" href="/urls/<%= url.shortURL %>">Edit</a></td>
           <td>
-            <form action="/urls/<%= url.shortURL %>/delete" method="POST">
+            <form action="/urls/<%= url.shortURL %>?_method=DELETE" method="POST">
               <button class="btn btn-outline-danger btn-sm">Delete</input>
             </form>
           </td>
