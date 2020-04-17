@@ -3,6 +3,9 @@
 // Node Imports
 const fs = require('fs');
 
+// Third Party Imports
+const bcrypt = require('bcrypt');
+
 // Local Imports
 const { generateRandomString } = require('../services');
 
@@ -21,13 +24,8 @@ class Users {
    * @param {string} userPassword
    */
   addUser(userEmail, userPassword) {
-    const newUserID = generateRandomString(8);
-    const newUser = {
-      id: newUserID,
-      email: userEmail,
-      password: userPassword
-    };
-    this._users[newUserID] = newUser;
+    const newUser = new User(userEmail, userPassword);
+    this._users[newUser.id] = newUser;
     if (!this._disableCache) this.writeToCache();
     return newUser;
   }
@@ -68,6 +66,32 @@ class Users {
         console.log('Users successfully written to cache.');
       }
     });
+  }
+}
+
+class User {
+  constructor(userEmail, userPassword) {
+    this.data = {
+      id: generateRandomString(8),
+      email: userEmail,
+      password: bcrypt.hashSync(userPassword, 10)
+    }
+  }
+
+  get id() {
+    return this.data.id;
+  }
+
+  get email() {
+    return this.data.email;
+  }
+
+  get password() {
+    return this.data.password;
+  }
+
+  confirmPassword(password) {
+    return bcrypt.compareSync(password, this.password);
   }
 }
 
