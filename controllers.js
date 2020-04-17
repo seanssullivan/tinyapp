@@ -3,7 +3,7 @@
 
 // Local Imports
 const cachedURLs = require('./cache/urls.json');
-const Urls = require('./models/urls');
+const { Urls } = require('./models/urls');
 
 const urls = new Urls(cachedURLs);
 

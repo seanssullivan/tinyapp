@@ -44,7 +44,8 @@ class Urls {
    */
   getLongURL(shortURL) {
     const url = this._urls[shortURL];
-    if (url) return url.longURL;
+    // console.log(url);
+    return url.longURL;
   }
 
   /**
@@ -112,8 +113,12 @@ class Url {
     this._data.longURL = newURL;
   }
 
-  get owner() {
+  get userID() {
     return this._data.userID;
+  }
+
+  get owner() {
+    return this.userID;
   }
 
   /**
@@ -148,4 +153,4 @@ class Url {
   }
 }
 
-module.exports = Urls;
+module.exports = { Urls, Url };

@@ -79,7 +79,6 @@ class User {
       this.data = userData.data;
 
     } else {
-      console.log(userData["password"]);
       this.data = {
         id: generateRandomString(8),
         email: userData["email"],
