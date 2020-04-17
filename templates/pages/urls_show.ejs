@@ -13,12 +13,16 @@
 
   <%- include('../partials/_header') %>
   
-  <% if(user.id) { %>
+  <% if(user.id && longURL) { %>
     <div class="card text-center">
         <div class="card-header"></div>
         <div class="card-body">
           <h5 class="card-title">TinyURL for: <%= longURL %></h5>
           <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+          <% if (owner) { %>
+            <p class="card-text">Total Clicks: <%= totalClicks %></p>
+            <p class="card-text">Unique Clicks: <%= uniqueClicks %></p>
+          <% } %>
         </div>
       <div class="card-footer text-muted">
         <% if(owner) { %>
@@ -35,6 +39,8 @@
         <% } %>
       </div>
     </div>
+  <% } else if (user.id) { %>
+    <p>Sorry, that url does not exist.</p>
   <% } else { %>
     <p>Please <a href="/login">login</a> to view this url.</p>
   <% } %>

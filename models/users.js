@@ -10,8 +10,9 @@ const { generateRandomString } = require('../services');
  * User object manages all user information.
  */
 class Users {
-  constructor(userData) {
+  constructor(userData, disableCache = false) {
     this._users = userData;
+    this._disableCache = disableCache;
   }
 
   /**
@@ -27,7 +28,7 @@ class Users {
       password: userPassword
     };
     this._users[newUserID] = newUser;
-    this.writeToCache();
+    if (!this._disableCache) this.writeToCache();
     return newUser;
   }
 

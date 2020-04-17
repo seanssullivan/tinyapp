@@ -9,17 +9,23 @@ const bcrypt = require('bcrypt');
  */
 const authenticate = (users) => {
   return (req, res, next) => {
+    console.log(req.method);
     if (req.session.user_id) {
       req.user = authFromCookie(req, users);
 
-    } else if (req.body.email && req.body.password && req.url === "/login") {
+    } else if (req.originalUrl === "/login" && req.method === "POST") {
       req.user = authFromLogin(req, users);
 
-    } else if (req.body.email && req.body.password && req.url === "/register") {
+    } else if (req.originalUrl === "/register" && req.method === "POST") {
       req.user = authFromRegistration(req, users);
 
     } else {
-      req.user = { id: null, email: null, authenticated: false };
+      req.user = {
+        id: null,
+        email: null,
+        authenticated: false,
+        error: { email: null, password: null }
+      };
     }
     next();
   };
@@ -36,9 +42,20 @@ const authFromCookie = (req, users) => {
 
   let credentials;
   if (user) {
-    credentials = { id: user.id, email: user.email, authenticated: true };
+    credentials = {
+      id: user.id,
+      email: user.email,
+      authenticated: true,
+      error: null
+    };
+
   } else {
-    credentials = { id: null, email: null, authenticated: false };
+    credentials = {
+      id: null,
+      email: null,
+      authenticated: false,
+      error: null
+    };
   }
   return credentials;
 };
@@ -52,12 +69,35 @@ const authFromLogin = (req, users) => {
   const user = users.findUserByEmail(req.body.email);
 
   let credentials;
-  if (bcrypt.compareSync(req.body.password, user.password)) {
-    credentials = { id: user.id, email: user.email, authenticated: true };
+  if (!req.body.email) {
+    credentials = {
+      id: null,
+      email: null,
+      authenticated: false,
+      error: { email: "please enter an email address", password: null }
+    };
+  } else if (!req.body.password) {
+    credentials = {
+      id: null,
+      email: null,
+      authenticated: false,
+      error: { email: null, password: "please enter a password" }
+    };
+  } else if (bcrypt.compareSync(req.body.password, user.password)) {
     req.session.user_id = user.id;
-
+    credentials = {
+      id: user.id,
+      email: user.email,
+      authenticated: true,
+      error: { email: null, password: null }
+    };
   } else {
-    credentials = { id: user.id, email: user.id, authenticated: false };
+    credentials = {
+      id: user.id,
+      email: user.id,
+      authenticated: false,
+      error: { email: null, password: "Email and password do not match an existing " }
+    };
 
   }
   return credentials;
@@ -70,16 +110,43 @@ const authFromLogin = (req, users) => {
  */
 const authFromRegistration = (req, users) => {
   let credentials;
-  if (users.emailInUse(req.body.email)) {
-    credentials = { id: null, email: req.body.email, authenticated: false };
+  if (!req.body.email) {
+    credentials = {
+      id: null,
+      email: null,
+      authenticated: false,
+      error: { email: "please enter an email address", password: null }
+    };
+
+  } else if (!req.body.password) {
+    credentials = {
+      id: null,
+      email: null,
+      authenticated: false,
+      error: { email: null, password: "please enter a password" }
+    };
+
+  } else if (users.emailInUse(req.body.email)) {
+    credentials = {
+      id: null,
+      email: req.body.email,
+      authenticated: false,
+      error: { email: "email already in use", password: null }
+    };
+
 
   } else {
     const { email, password } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
     const user = users.addUser(email, hashedPassword);
 
-    credentials = { id: user.id, email: user.email, authenticated: true };
-    req.session.user_id = req.user.id;
+    req.session.user_id = user.id;
+    credentials = {
+      id: user.id,
+      email: user.email,
+      authenticated: true,
+      error: null
+    };
   }
   return credentials;
 };
